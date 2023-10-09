@@ -5,7 +5,7 @@ file(GLOB_RECURSE GAEA_SOURCES
 file(GLOB_RECURSE GAEA_INCLUDES
     ./**.h)
 
-add_library(Gaea SHARED ${GAEA_SOURCES})
+add_library(Gaea STATIC ${GAEA_SOURCES})
 set_target_properties(Gaea PROPERTIES PUBLIC_HEADERS .)
 target_include_directories(Gaea
     PRIVATE
