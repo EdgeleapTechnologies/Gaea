@@ -1,5 +1,8 @@
 #pragma once
 
+namespace Edgeleap
+{
+
 //8-bit data types
 typedef unsigned char uint8;
 typedef unsigned char u8;
@@ -57,8 +60,11 @@ template<typename T> struct remove_reference      { typedef T type; };
 template<typename T> struct remove_reference<T&>  { typedef T type; };
 template<typename T> struct remove_reference<T&&> { typedef T type; };
 
-template<typename T> inline typename remove_reference<T>::type&& rmove(T&& param) noexcept 
+template<typename T> inline typename remove_reference<T>::type&& move(T&& param) noexcept 
 {
     return static_cast<typename remove_reference<T>::type&&>(param);
 }
 // clang-format on
+
+
+}
