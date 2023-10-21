@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
+
+include(CMake/Warnings.cmake)
+
 # ============================ Functions =========================== #
 function(extract_platform_dependent_sources
         all_sources # input
@@ -36,6 +39,8 @@ function(extract_platform_dependent_sources
 endfunction()
 # ================================================================== #
 
+project(Gaea LANGUAGES C CXX)
+
 set(GAEA_LIB "Gaea")
 file(GLOB_RECURSE GAEA_SOURCES
     ./**.cpp)
@@ -47,6 +52,8 @@ extract_platform_dependent_sources("${GAEA_SOURCES}"
     gaea_posix_sources)
 
 add_library(${GAEA_LIB} STATIC ${gaea_common_sources})
+configure_compiler_warnings("${GAEA_LIB}")
+
 set_property(TARGET ${GAEA_LIB} PROPERTY CXX_STANDARD 20)
 set_target_properties(${GAEA_LIB} PROPERTIES PUBLIC_HEADERS .)
 target_include_directories(${GAEA_LIB}
@@ -59,18 +66,6 @@ target_include_directories(${GAEA_LIB}
         # where external projects will look for the library's public headers
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
-
-# ===================== Warnings Configuration =============================== #
-set(GAEA_MSVC_WARNINGS
-    /W4 /WX)
-set(GAEA_WARNINGS
-    -Wall -Wextra -Wpedantic -Werror)
-if(MSVC)
-    target_compile_options(${GAEA_LIB} PRIVATE ${GAEA_MSVC_WARNINGS})
-else()
-    target_compile_options(${GAEA_LIB} PRIVATE ${GAEA_WARNINGS})
-endif()
-# =========================================================================== #
 
 # ==================== Platform Specific Sources ========================== #
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Linux")
