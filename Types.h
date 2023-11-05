@@ -33,13 +33,13 @@ typedef double f64;
 
 #ifdef __x86_64__
 
-typedef uint64 uArchInt;
-typedef int64 sArchInt;
+typedef uint64 size_t;
+typedef int64 s_size_t;
 
 #else
 
-typedef uint32 uArchInt;
-typedef int32 sArchInt;
+typedef uint32 size_t;
+typedef int32 s_size_t;
 
 #endif
 
@@ -67,3 +67,4 @@ template<typename T> inline typename remove_reference<T>::type&& move(T&& param)
 // clang-format on
 
 }
+
