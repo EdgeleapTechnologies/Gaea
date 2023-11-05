@@ -26,6 +26,8 @@ function(extract_platform_dependent_sources
             list(APPEND macos_result ${source})
         elseif(source MATCHES ".*\/[P|p][O|o][S|s][I|i][X|x]\/.*") #posix source file
             list(APPEND posix_result ${source})
+        elseif(source MATCHES ".*\/tests\/.*") # ignore tests files
+        elseif(source MATCHES ".*\/ThirdParty\/.*") # ignore third party files
         else()
             list(APPEND platform_independent_result ${source})
         endif()
@@ -40,6 +42,16 @@ endfunction()
 # ================================================================== #
 
 project(Gaea LANGUAGES C CXX)
+
+#set output directory structure
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL ${CMAKE_BINARY_DIR})
 
 set(GAEA_LIB "Gaea")
 file(GLOB_RECURSE GAEA_SOURCES
@@ -80,3 +92,8 @@ if("${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
     target_sources(${GAEA_LIB} PRIVATE ${gaea_windows_sources})
 endif()
 # ========================================================================= #
+
+# ================= Tests ================================= #
+add_subdirectory(ThirdParty/Catch2/ EXCLUDE_FROM_ALL)
+add_subdirectory(tests)
+# ========================================================= #
