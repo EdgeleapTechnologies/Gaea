@@ -7,7 +7,12 @@ namespace Edgeleap
 
 void* GlobalAllocate(size_t size)
 {
-    return malloc(size);
+    return ::malloc(size);
+}
+
+void GlobalFree(void* ptr)
+{
+    ::free(ptr);
 }
 
 }
