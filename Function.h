@@ -2,7 +2,6 @@
 
 #include <Types.h>
 #include <Memory.h>
-#include <winbase.h>
 
 namespace Edgeleap
 {

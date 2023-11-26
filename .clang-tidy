@@ -27,5 +27,6 @@ Checks: '*,
   -misc-unused-parameters,
   -google-build-using-namespace'
 
+HeaderFilterRegex: '.*'
 WarningsAsErrors: '*,-clang-diagnostic-error'
 FormatStyle: none

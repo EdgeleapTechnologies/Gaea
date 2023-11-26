@@ -1,11 +1,9 @@
 cd $PSScriptRoot
 cd ..
 
-$common_sources=get-ChildItem ./ -recurse | Select-Object -Expand FullName | where {$_ -like "*.cpp"}
-$common_sources+=" "
-$common_sources+=get-ChildItem ./ -recurse | Select-Object -Expand FullName | where {$_ -like "*.h"}
-$common_sources+=" "
-$common_sources+=get-ChildItem ./ -recurse | Select-Object -Expand FullName | where {$_ -like "*.hpp"}
+$sources=Get-ChildItem ./ -recurse -Exclude ThirdParty | Select-Object -Expand FullName | where {$_ -Match "^((?!build)(?!ThirdParty)(?!tests).)*\.(cpp|h|hpp)$"}
 
-Invoke-Expression "clang-tidy --config-file=.clang-tidy $common_sources"
+echo $sources
+
+Invoke-Expression "clang-tidy --config-file=.clang-tidy $sources"
 exit $LASTEXITCODE
