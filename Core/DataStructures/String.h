@@ -1,12 +1,14 @@
 #pragma once
 
-#include <string>
+#include <Core/SmartPointers.h>
 
 namespace Edgeleap
 {
 
-class String: public std::string
+class String
 {
+private:
+    AutoPtr<char> m_string = nullptr;
 };
 
 }
