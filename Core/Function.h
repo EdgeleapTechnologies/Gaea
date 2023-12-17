@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Types.h>
-#include <Memory.h>
+#include <Core/Types.h>
+#include <Core/Memory.h>
 
 namespace Edgeleap
 {
