@@ -23,6 +23,20 @@ private:
 public:
     Function() = default;
 
+    Function(Return (*function)(Parameters...))
+    {
+        //NOTE(Tiago):for now the way we will handle static funciton pointers by keeping the
+        //function size variable at 0, despite the storage variable not being null. This
+        //combination of flags will be used to denote that the pointer the storage variable
+        //is directly a function pointer and not a lamba storage pointer.
+        this->m_function_type_storage = (void*)function;
+        this->m_call_helper = [](const Function& function, Parameters... parameters) -> Return {
+            using callable_function_type = Return (*)(Parameters...);
+            callable_function_type callable = (callable_function_type)function.m_function_type_storage;
+            return (*callable)(move(parameters)...);
+        };
+    }
+
     template<typename Callable>
     Function(const Callable& callable)
     {
@@ -30,8 +44,7 @@ public:
         this->m_function_type_storage = GlobalAllocate(this->m_funtion_size);
         memcpy(this->m_function_type_storage, &callable, this->m_funtion_size);
 
-        this->m_call_helper = [](const Function& function, Parameters... parameters) -> Return
-        {
+        this->m_call_helper = [](const Function& function, Parameters... parameters) -> Return {
             const Callable* callable_function = (const Callable*)function.m_function_type_storage;
             return (*callable_function)(move(parameters)...);
         };
@@ -39,7 +52,7 @@ public:
 
     ~Function()
     {
-        if(this->m_function_type_storage != nullptr)
+        if(this->m_function_type_storage != nullptr && this->m_funtion_size != 0)
         {
             GlobalFree(this->m_function_type_storage);
             this->m_function_type_storage = nullptr;
@@ -55,8 +68,29 @@ public:
 
         this->m_call_helper = other.m_call_helper;
         this->m_funtion_size = other.m_funtion_size;
-        this->m_function_type_storage = malloc(this->m_funtion_size);
-        memcpy(this->m_function_type_storage, other.m_function_type_storage, this->m_funtion_size);
+        if(this->m_funtion_size != 0 && other.m_function_type_storage != nullptr)
+        {
+            this->m_function_type_storage = malloc(this->m_funtion_size);
+            memcpy(this->m_function_type_storage, other.m_function_type_storage, this->m_funtion_size);
+        }
+        else { this->m_function_type_storage = other.m_function_type_storage; }
+    }
+
+    Function& operator=(const Function& other)
+    {
+        if(this == &other) return *this;
+        this->~Function();
+
+        this->m_call_helper = other.m_call_helper;
+        this->m_funtion_size = other.m_funtion_size;
+        if(this->m_function_type_storage != 0 && other.m_function_type_storage != nullptr)
+        {
+            this->m_function_type_storage = malloc(this->m_funtion_size);
+            memcpy(this->m_function_type_storage, other.m_function_type_storage, this->m_funtion_size);
+        }
+        else { this->m_function_type_storage = other.m_function_type_storage; }
+
+        return *this;
     }
 
     Function(Function&& other)
@@ -74,38 +108,6 @@ public:
         other.m_call_helper = nullptr;
     }
 
-    template<typename Callable>
-    Function& operator=(const Callable& callable)
-    {
-        if(this == &callable) return *this;
-        this->~Function();
-
-        this->m_funtion_size = sizeof(callable);
-        this->m_function_type_storage = GlobalAllocate(this->m_funtion_size);
-        memcpy(this->m_function_type_storage, &callable, this->m_funtion_size);
-
-        this->m_call_helper = [](const Function& function, Parameters... parameters) -> Return
-        {
-            const Callable* callable_function = (const Callable*)function.m_function_type_storage;
-            return (*callable_function)(move(parameters)...);
-        };
-
-        return *this;
-    }
-
-    Function& operator=(const Function& other)
-    {
-        if(this == &other) return *this;
-        this->~Function();
-
-        this->m_call_helper = other.m_call_helper;
-        this->m_funtion_size = other.m_funtion_size;
-        this->m_function_type_storage = malloc(this->m_funtion_size);
-        memcpy(this->m_function_type_storage, other.m_function_type_storage, this->m_funtion_size);
-
-        return *this;
-    }
-
     Function& operator=(Function&& other)
     {
         if(this == &other) return *this;
@@ -120,11 +122,29 @@ public:
         return *this;
     }
 
-    Return operator()(Parameters... parameters)
+    template<typename Callable>
+    Function& operator=(const Callable& callable)
     {
-        return this->m_call_helper(*this, move(parameters)...);
+        if(this == &callable) return *this;
+        this->~Function();
+
+        this->m_funtion_size = sizeof(callable);
+        this->m_function_type_storage = GlobalAllocate(this->m_funtion_size);
+        memcpy(this->m_function_type_storage, &callable, this->m_funtion_size);
+
+        this->m_call_helper = [](const Function& function, Parameters... parameters) -> Return {
+            const Callable* callable_function = (const Callable*)function.m_function_type_storage;
+            return (*callable_function)(move(parameters)...);
+        };
+
+        return *this;
     }
 
+    Return operator()(Parameters... parameters)
+    {
+        if(this->m_function_type_storage == nullptr) { return Return(); }
+        return this->m_call_helper(*this, move(parameters)...);
+    }
 };
 
 }

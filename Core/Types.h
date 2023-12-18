@@ -67,4 +67,3 @@ template<typename T> inline typename remove_reference<T>::type&& move(T&& param)
 // clang-format on
 
 }
-
