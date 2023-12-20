@@ -1,3 +1,5 @@
+#include <catch2/catch_test_macros.hpp>
+
 #include <Core/Function.h>
 #include <catch2/catch_test_macros.hpp>
 
@@ -28,10 +30,16 @@ TEST_CASE("Function can contain any callable", "Construction & operator() testin
 
     SECTION("Lambda without capture group")
     {
+        Edgeleap::Function<int(void)> lambda([]() -> int { return 5; });
+        REQUIRE(lambda() == 5);
     }
 
     SECTION("Lambda with capture group")
     {
+        int test_value = 6;
+        Edgeleap::Function<int(void)> lambda([&test_value]() -> int { return test_value; });
+        test_value = 57;
+        REQUIRE(lambda() == test_value);
     }
 }
 
