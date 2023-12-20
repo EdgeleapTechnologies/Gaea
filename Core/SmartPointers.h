@@ -17,7 +17,7 @@ public:
     AutoPtr(const AutoPtr&) = delete;
     AutoPtr& operator=(const AutoPtr&) = delete;
 
-    AutoPtr(T* const ptr): ptr(ptr){};
+    AutoPtr(const T* const ptr): ptr(ptr){};
     AutoPtr(decltype(nullptr)): ptr(nullptr){};
 
     AutoPtr(T*&& ptr)
