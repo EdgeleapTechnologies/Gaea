@@ -25,6 +25,11 @@ public:
     String& operator=(const String& other);
     String& operator=(String&& other);
 
+    char& operator[](size_t index);
+    char at(size_t index) const;
+    size_t legth() const;
+    const char* data() const;
+
     static size_t ComputeStringLength(const char* string);
 };
 
