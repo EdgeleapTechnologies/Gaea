@@ -24,6 +24,10 @@ public:
     ~AutoPtr()
     {
         if(this->ptr == nullptr) return;
+
+        this->ptr->~T();
+
+        if(this->allocator == nullptr) return;
         this->allocator->Free((void*)this->ptr);
     }
 
@@ -35,6 +39,9 @@ public:
 
     AutoPtr(AutoPtr&& other)
     {
+        if(&other == this) return;
+        this->~AutoPtr();
+
         this->allocator = other.allocator;
         other.allocator = nullptr;
 
@@ -45,6 +52,7 @@ public:
     AutoPtr& operator=(AutoPtr&& other)
     {
         if(this == &other) return *this;
+        this->~AutoPtr();
 
         this->allocator = other.allocator;
         other.allocator = nullptr;

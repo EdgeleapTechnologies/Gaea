@@ -7,7 +7,35 @@
 namespace Edgeleap
 {
 
-class String
+size_t ComputeStringLength(const char* string);
+
+struct String;
+
+struct StringView
+{
+    char* string = nullptr;
+    size_t length = 0;
+
+    StringView(const char* string);
+    StringView(const char* string, size_t length);
+    StringView(const String& string);
+
+    StringView() = default;
+    ~StringView() = default;
+    StringView(const StringView& other);
+    StringView(StringView&& other);
+    StringView& operator=(const StringView& other);
+    StringView& operator=(StringView&& other);
+
+    char* begin() const;
+    char* end() const;
+
+    char operator[](size_t index) const;
+    StringView Slice(size_t start_index, size_t end_index);
+    String Clone() const;
+};
+
+struct String
 {
 private:
     AutoPtr<char> m_string = nullptr;
@@ -30,8 +58,6 @@ public:
     char at(size_t index) const;
     size_t legth() const;
     const char* data() const;
-
-    static size_t ComputeStringLength(const char* string);
 };
 
 }
