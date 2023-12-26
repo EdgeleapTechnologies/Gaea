@@ -1,7 +1,6 @@
 #pragma once
 
 #include <Core/Types.h>
-#include <string.h>
 
 namespace Edgeleap
 {
@@ -33,6 +32,8 @@ class SystemAllocator: public Allocator
 public:
     SystemAllocator() = default;
 
+    static SystemAllocator& Instance();
+
     inline void* Allocate(size_t length) override
     {
         return GlobalAllocate(length);
@@ -43,6 +44,5 @@ public:
         GlobalFree(ptr);
     }
 };
-
 
 }

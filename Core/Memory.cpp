@@ -6,6 +6,12 @@
 namespace Edgeleap
 {
 
+SystemAllocator& SystemAllocator::Instance()
+{
+    static SystemAllocator instance;
+    return instance;
+}
+
 void* GlobalAllocate(size_t size)
 {
     return ::malloc(size);
