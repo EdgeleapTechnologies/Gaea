@@ -32,4 +32,13 @@ void MemCopy(void* destination, void* source, size_t size)
     }
 }
 
+void MemSet(void* destination, size_t length, u8 ValueToSet)
+{
+    u8* buffer = (u8*)destination;
+    for(size_t i = 0; i < length; ++i)
+    {
+        buffer[i] = ValueToSet;
+    }
+}
+
 }

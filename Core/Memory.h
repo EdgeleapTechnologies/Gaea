@@ -8,6 +8,7 @@ namespace Edgeleap
 void* GlobalAllocate(size_t size);
 void GlobalFree(void* ptr);
 void MemCopy(void* destination, void* source, size_t size);
+void MemSet(void* destination, size_t length, u8 ValueToSet);
 
 // Allocator interface that can be used as generic allocator input
 // for other methods
