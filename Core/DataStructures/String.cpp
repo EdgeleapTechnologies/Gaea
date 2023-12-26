@@ -18,6 +18,69 @@ size_t ComputeStringLength(const char* string)
     return counter;
 }
 
+StringView::StringView(const char* string):
+    string(string), length(ComputeStringLength(string)) {}
+
+StringView::StringView(const char* string, size_t length):
+    string(string), length(length) {}
+
+StringView::StringView(const String& string):
+    string(string.data()), length(string.legth()) {}
+
+StringView::StringView(const StringView& other):
+    string(other.string), length(other.length) {}
+
+StringView& StringView::operator=(const StringView& other)
+{
+    this->string = other.string;
+    this->length = other.length;
+    return *this;
+}
+
+const char* StringView::begin() const
+{
+    return string;
+}
+
+const char* StringView::end() const
+{
+    return string + (length + 1);
+}
+
+char StringView::operator[](size_t index) const
+{
+    return this->string[index];
+}
+
+bool StringView::operator==(const StringView& other) const
+{
+    if(this->string == nullptr && other.string != nullptr) return false;
+    if(other.string != nullptr && this->string != nullptr) return false;
+    if(this->length != other.length) return false;
+
+    return MemCompare((void*)this->string, (void*)other.string, this->length);
+}
+
+bool StringView::operator==(const String& other) const
+{
+    if(this->string == nullptr && other.data() != nullptr) return false;
+    if(other.data() == nullptr && this->string != nullptr) return false;
+    if(this->length != other.legth()) return false;
+
+    return MemCompare((void*)this->string, (void*)other.data(), this->length);
+}
+
+StringView StringView::Slice(size_t start_index, size_t end_index) const
+{
+    size_t len = end_index - start_index + 1;
+    return {&this->string[start_index], len};
+}
+
+String StringView::Clone(Allocator* allocator) const
+{
+    return {this->string, this->length, allocator};
+}
+
 String::String(const char* string, Allocator* allocator)
 {
     this->m_string_length = ComputeStringLength(string);

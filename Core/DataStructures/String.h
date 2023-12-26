@@ -13,26 +13,28 @@ struct String;
 
 struct StringView
 {
-    char* string = nullptr;
+public:
+    const char* string = nullptr;
     size_t length = 0;
 
+public:
     StringView(const char* string);
     StringView(const char* string, size_t length);
     StringView(const String& string);
 
     StringView() = default;
-    ~StringView() = default;
     StringView(const StringView& other);
-    StringView(StringView&& other);
     StringView& operator=(const StringView& other);
-    StringView& operator=(StringView&& other);
 
-    char* begin() const;
-    char* end() const;
+    const char* begin() const;
+    const char* end() const;
 
     char operator[](size_t index) const;
-    StringView Slice(size_t start_index, size_t end_index);
-    String Clone() const;
+    bool operator==(const StringView& other) const;
+    bool operator==(const String& other) const;
+
+    StringView Slice(size_t start_index, size_t end_index) const;
+    String Clone(Allocator* allocator = &SystemAllocator::Instance()) const;
 };
 
 struct String
