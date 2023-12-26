@@ -6,33 +6,37 @@
 namespace Edgeleap
 {
 
-String::String(const char* string)
+String::String(const char* string, Allocator* allocator)
 {
     this->m_string_length = String::ComputeStringLength(string);
-    this->m_string = (char*)GlobalAllocate(this->m_string_length);
+    this->m_string = {(char*)allocator->Allocate(this->m_string_length), allocator};
     MemCopy((void*)this->m_string.ptr, (void*)string, this->m_string_length);
 }
 
-String::String(const char* string, size_t length)
+String::String(const char* string, size_t length, Allocator* allocator)
 {
     this->m_string_length = length;
-    this->m_string = (char*)GlobalAllocate(this->m_string_length);
+    this->m_string = {(char*)allocator->Allocate(this->m_string_length), allocator};
     MemCopy((void*)this->m_string.ptr, (void*)string, this->m_string_length);
 }
 
 String::String(const String& other)
 {
     if(&other == this) return;
+    this->m_string.~AutoPtr<char>();
 
     this->m_string_length = other.m_string_length;
+    this->m_string = {(char*)other.m_string.allocator->Allocate(this->m_string_length), other.m_string.allocator};
     MemCopy((void*)this->m_string.ptr, (void*)other.m_string.ptr, this->m_string_length);
 }
 
 String& String::operator=(const String& other)
 {
     if(&other == this) return *this;
+    this->m_string.~AutoPtr<char>();
 
     this->m_string_length = other.m_string_length;
+    this->m_string = {(char*)other.m_string.allocator->Allocate(this->m_string_length), other.m_string.allocator};
     MemCopy((void*)this->m_string.ptr, (void*)other.m_string.ptr, this->m_string_length);
 
     return *this;

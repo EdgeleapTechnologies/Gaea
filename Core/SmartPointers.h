@@ -5,10 +5,11 @@
 namespace Edgeleap
 {
 
-template<typename T, typename del = decltype(&GlobalFree)>
+template<typename T>
 class AutoPtr
 {
 public:
+    Allocator* allocator = nullptr;
     T* ptr = nullptr;
 
 public:
@@ -17,10 +18,16 @@ public:
     AutoPtr(const AutoPtr&) = delete;
     AutoPtr& operator=(const AutoPtr&) = delete;
 
-    AutoPtr(const T* const ptr): ptr(ptr){};
+    AutoPtr(const T* const ptr, Allocator* allocator = &SystemAllocator::Instance()): ptr(ptr), allocator(allocator){};
     AutoPtr(decltype(nullptr)): ptr(nullptr){};
 
-    AutoPtr(T*&& ptr)
+    ~AutoPtr()
+    {
+        if(this->ptr == nullptr) return;
+        this->allocator->Free((void*)this->ptr);
+    }
+
+    AutoPtr(T*&& ptr, Allocator* allocator = &SystemAllocator::Instance()): allocator(allocator)
     {
         this->ptr = ptr;
         ptr = nullptr;
@@ -28,19 +35,19 @@ public:
 
     AutoPtr(AutoPtr&& other)
     {
+        this->allocator = other.allocator;
+        other.allocator = nullptr;
+
         this->ptr = other.ptr;
         other.ptr = nullptr;
-    }
-
-    ~AutoPtr()
-    {
-        if(this->ptr == nullptr) return;
-        (void)del((void*)this->ptr);
     }
 
     AutoPtr& operator=(AutoPtr&& other)
     {
         if(this == &other) return *this;
+
+        this->allocator = other.allocator;
+        other.allocator = nullptr;
 
         this->ptr = other.ptr;
         other.ptr = nullptr;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Core/Memory.h>
 #include <Core/SmartPointers.h>
 #include <Core/Types.h>
 
@@ -16,8 +17,8 @@ public:
     String() = default;
     ~String() = default;
 
-    String(const char* string);
-    String(const char* string, size_t length);
+    String(const char* string, Allocator* allocator = &SystemAllocator::Instance());
+    String(const char* string, size_t length, Allocator* allocator = &SystemAllocator::Instance());
 
     //rule of 5 operators & constructors
     String(const String& other);
